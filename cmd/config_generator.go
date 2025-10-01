@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"time"
@@ -71,10 +70,10 @@ var (
 		Usage: "Number of blocks after which the votes are reset",
 		Value: 30000,
 	}
-	difficultyFlag = &cli.StringFlag{
+	difficultyFlag = &cli.IntFlag{
 		Name:  "difficulty",
-		Usage: "Difficulty of the network (in hex)",
-		Value: "0x1",
+		Usage: "Difficulty of the network",
+		Value: 0x1,
 	}
 	outputFlag = &cli.StringFlag{
 		Name:  "output",
@@ -82,7 +81,7 @@ var (
 	}
 )
 
-var app = newApp("Besu Genesis Generator")
+var app = newApp("Besu Config Generator")
 
 func newApp(usage string) *cli.Command {
 	app := &cli.Command{}
@@ -93,7 +92,7 @@ func newApp(usage string) *cli.Command {
 }
 
 func init() {
-	app.Name = "besu-genesis-generator"
+	app.Name = "besu-config-generator"
 	app.Flags = []cli.Flag{
 		chainIDFlag,
 		coinbaseFlag,
@@ -114,7 +113,7 @@ func init() {
 }
 
 func generate(ctx context.Context, c *cli.Command) error {
-	genesis := lib.Genesis{
+	genesis := &lib.Genesis{
 		Timestamp:  hexutil.EncodeUint64(uint64(time.Now().Unix())),
 		Coinbase:   c.String(coinbaseFlag.Name),
 		Nonce:      "0x0",
@@ -150,13 +149,34 @@ func generate(ctx context.Context, c *cli.Command) error {
 		},
 	}
 
-	data, err := json.MarshalIndent(genesis, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal genesis: %v", err)
+	userData := &lib.UserData{
+		Consensus:         "qbft",
+		ChainID:           c.Int(chainIDFlag.Name),
+		Coinbase:          c.String(coinbaseFlag.Name),
+		BlockPeriod:       c.Int(blockperiodFlag.Name),
+		RequestTimeout:    c.Int(requestTimeoutFlag.Name),
+		XEmptyBlockPeriod: c.Bool(xemptyBlockPeriodFlag.Name),
+		EmptyBlockPeriod:  c.Int(emptyBlockPeriodFlag.Name),
+		EpochLength:       c.Int(epochLengthFlag.Name),
+		Difficulty:        c.Int(difficultyFlag.Name),
+		GasLimit:          c.String(gasLimitFlag.Name),
+		MaxCodeSize:       c.Int(maxCodeSizeFlag.Name),
+		TxnSizeLimit:      c.Int(txnSizeLimitFlag.Name),
+		Validators:        c.Int(validatorsFlag.Name),
+		AccountPassword:   c.String(accountPasswordFlag.Name),
+		OutputPath:        c.String(outputFlag.Name),
 	}
 
-	if err := os.WriteFile(c.String(outputFlag.Name), data, 0644); err != nil {
-		return fmt.Errorf("failed to write genesis file: %v", err)
+	if err := genesis.Save(c.String(outputFlag.Name)); err != nil {
+		return err
+	}
+
+	if err := userData.Save(c.String(outputFlag.Name)); err != nil {
+		return err
+	}
+
+	if err := lib.SaveConfigTOML(c.String(outputFlag.Name), c.Int(chainIDFlag.Name), "0.0.0.0", 30303); err != nil {
+		return err
 	}
 
 	return nil
