@@ -1,5 +1,11 @@
 package lib
 
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
+
 type Genesis struct {
 	Nonce      string `json:"nonce"`
 	Timestamp  string `json:"timestamp"`
@@ -64,4 +70,29 @@ type UserData struct {
 	Validators        int    `json:"validators"`
 	AccountPassword   string `json:"accountPassword"`
 	OutputPath        string `json:"outputPath"`
+}
+
+func (g *Genesis) Save(folder string) error {
+	return saveJSON(g, fmt.Sprintf("%s/besu", folder), fmt.Sprintf("%s/besu/genesis.json", folder))
+}
+
+func (u *UserData) Save(folder string) error {
+	return saveJSON(u, folder, fmt.Sprintf("%s/userData.json", folder))
+}
+
+func saveJSON[T any](value T, dirName, fileName string) error {
+	data, err := json.MarshalIndent(value, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal: %w", err)
+	}
+
+	if err := os.MkdirAll(dirName, 0755); err != nil {
+		return fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	if err := os.WriteFile(fileName, data, 0644); err != nil {
+		return fmt.Errorf("failed to write file: %w", err)
+	}
+
+	return nil
 }
