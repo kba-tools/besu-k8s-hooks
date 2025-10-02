@@ -72,12 +72,12 @@ type UserData struct {
 	OutputPath        string `json:"outputPath"`
 }
 
-func (g *Genesis) Save(folder string) error {
-	return saveJSON(g, fmt.Sprintf("%s/besu", folder), fmt.Sprintf("%s/besu/genesis.json", folder))
+func (g *Genesis) Save(dirName string) error {
+	return saveJSON(g, fmt.Sprintf("%s/besu", dirName), fmt.Sprintf("%s/besu/genesis.json", dirName))
 }
 
-func (u *UserData) Save(folder string) error {
-	return saveJSON(u, folder, fmt.Sprintf("%s/userData.json", folder))
+func (u *UserData) Save(dirName string) error {
+	return saveJSON(u, dirName, fmt.Sprintf("%s/userData.json", dirName))
 }
 
 func saveJSON[T any](value T, dirName, fileName string) error {

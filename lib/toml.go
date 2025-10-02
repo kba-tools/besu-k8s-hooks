@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func SaveConfigTOML(folder string, networkId int, p2pHost string, p2pPort int) error {
+func SaveConfigTOML(dirName string, networkId int, p2pHost string, p2pPort int) error {
 	content := fmt.Sprintf(`# Network
 network-id="%d"
 
@@ -55,5 +55,5 @@ static-nodes-file="/config/static-nodes.json"
 		p2pHost,
 		p2pPort)
 
-	return os.WriteFile(fmt.Sprintf("%s/besu/config.toml", folder), []byte(content), 0644)
+	return os.WriteFile(fmt.Sprintf("%s/besu/config.toml", dirName), []byte(content), 0644)
 }
