@@ -179,6 +179,18 @@ func generate(ctx context.Context, c *cli.Command) error {
 		return err
 	}
 
+	for i := range c.Int(validatorsFlag.Name) {
+		dirName := fmt.Sprintf("%s/validator%d", c.String(outputFlag.Name), i)
+		if err := os.MkdirAll(dirName, 0755); err != nil {
+			return fmt.Errorf("failed to create directory: %w", err)
+		}
+
+		if err := lib.GenerateValidatorKeys(dirName, c.String(accountPasswordFlag.Name)); err != nil {
+			return err
+		}
+
+	}
+
 	return nil
 }
 
