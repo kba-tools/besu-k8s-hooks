@@ -70,11 +70,6 @@ var (
 		Usage: "Number of blocks after which the votes are reset",
 		Value: 30000,
 	}
-	difficultyFlag = &cli.IntFlag{
-		Name:  "difficulty",
-		Usage: "Difficulty of the network",
-		Value: 0x1,
-	}
 	outputFlag = &cli.StringFlag{
 		Name:  "output",
 		Usage: "Output file location",
@@ -106,7 +101,6 @@ func init() {
 		maxCodeSizeFlag,
 		txnSizeLimitFlag,
 		epochLengthFlag,
-		difficultyFlag,
 		outputFlag,
 	}
 	app.Action = generate
@@ -120,7 +114,7 @@ func generate(ctx context.Context, c *cli.Command) error {
 		GasLimit:   c.String(gasLimitFlag.Name),
 		GasUsed:    "0x0",
 		Number:     "0x0",
-		Difficulty: c.String(difficultyFlag.Name),
+		Difficulty: "0x1",
 		ParentHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
 		MixHash:    "0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365",
 		ExtraData:  "0xf87aa00000000000000000000000000000000000000000000000000000000000000000f854948001d7a021b97ba1ee3db980e7b9951464e3d08494859e38d3039470de5edb161f205d74b80d7cf9b0949e33e1d20ccfcc4976b509d4ff852e2b8efcd504943333630c724d5d6dd53159c577114a1f0ce1c02bc080c0",
@@ -151,6 +145,7 @@ func generate(ctx context.Context, c *cli.Command) error {
 
 	userData := &lib.UserData{
 		Consensus:         "qbft",
+		Difficulty:        1,
 		ChainID:           c.Int(chainIDFlag.Name),
 		Coinbase:          c.String(coinbaseFlag.Name),
 		BlockPeriod:       c.Int(blockperiodFlag.Name),
@@ -158,7 +153,6 @@ func generate(ctx context.Context, c *cli.Command) error {
 		XEmptyBlockPeriod: c.Bool(xemptyBlockPeriodFlag.Name),
 		EmptyBlockPeriod:  c.Int(emptyBlockPeriodFlag.Name),
 		EpochLength:       c.Int(epochLengthFlag.Name),
-		Difficulty:        c.Int(difficultyFlag.Name),
 		GasLimit:          c.String(gasLimitFlag.Name),
 		MaxCodeSize:       c.Int(maxCodeSizeFlag.Name),
 		TxnSizeLimit:      c.Int(txnSizeLimitFlag.Name),
