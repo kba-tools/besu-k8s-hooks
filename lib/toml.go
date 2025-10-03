@@ -57,3 +57,36 @@ static-nodes-file="/config/static-nodes.json"
 
 	return os.WriteFile(fmt.Sprintf("%s/besu/config.toml", dirName), []byte(content), 0644)
 }
+
+func SaveAllowListTOML(dirName string, values []string) error {
+	f, err := os.Create(fmt.Sprintf("%s/besu/permissioned-nodes.toml", dirName))
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err = f.Close(); err != nil {
+			fmt.Printf("failed to close file: %v\n", err)
+		}
+	}()
+
+	if _, err = fmt.Fprintf(f, "nodes-allowlist=[\n"); err != nil {
+		return err
+	}
+
+	for i, v := range values {
+		comma := ","
+		if i == len(values)-1 {
+			comma = ""
+		}
+
+		if _, err := fmt.Fprintf(f, "  %q%s\n", v, comma); err != nil {
+			return err
+		}
+	}
+
+	if _, err = fmt.Fprintln(f, "]"); err != nil {
+		return err
+	}
+
+	return nil
+}
