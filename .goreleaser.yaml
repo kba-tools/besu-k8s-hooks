@@ -1,0 +1,14 @@
+version: 2
+builds:
+  - goos:
+      - linux
+    ignore:
+      - goarch: '386'
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/
+    binary: 'besu-config-generator'
+
+archives:
+  - id: tar.gz
+    formats: ['tar.gz']
