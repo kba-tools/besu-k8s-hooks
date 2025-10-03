@@ -157,6 +157,8 @@ func generate(ctx context.Context, c *cli.Command) error {
 		MaxCodeSize:           c.Int(maxCodeSizeFlag.Name),
 		TxnSizeLimit:          c.Int(txnSizeLimitFlag.Name),
 		Validators:            c.Int(validatorsFlag.Name),
+		Members:               0,
+		Bootnodes:             0,
 		AccountPassword:       c.String(accountPasswordFlag.Name),
 		OutputPath:            c.String(outputFlag.Name),
 		TesseraEnabled:        false,

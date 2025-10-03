@@ -68,6 +68,8 @@ type UserData struct {
 	MaxCodeSize           int      `json:"maxCodeSize"`
 	TxnSizeLimit          int      `json:"txnSizeLimit"`
 	Validators            int      `json:"validators"`
+	Members               int      `json:"members"`
+	Bootnodes             int      `json:"bootnodes"`
 	AccountPassword       string   `json:"accountPassword"`
 	OutputPath            string   `json:"outputPath"`
 	TesseraEnabled        bool     `json:"tesseraEnabled"`
