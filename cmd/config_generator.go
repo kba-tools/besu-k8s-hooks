@@ -141,6 +141,7 @@ func generate(ctx context.Context, c *cli.Command) error {
 				EpochLength:              c.Int(epochLengthFlag.Name),
 			},
 		},
+		Alloc: make(map[string]lib.AllocAccount, c.Int(validatorsFlag.Name)),
 	}
 
 	userData := &lib.UserData{
@@ -169,6 +170,11 @@ func generate(ctx context.Context, c *cli.Command) error {
 		GenesisNodeAllocation: "1000000000000000000000000000",
 	}
 
+	enodes, err := genesis.GenerateValidators(c.String(outputFlag.Name), c.Int(validatorsFlag.Name), c.String(accountPasswordFlag.Name))
+	if err != nil {
+		return err
+	}
+
 	if err := genesis.Save(c.String(outputFlag.Name)); err != nil {
 		return err
 	}
@@ -181,16 +187,8 @@ func generate(ctx context.Context, c *cli.Command) error {
 		return err
 	}
 
-	for i := range c.Int(validatorsFlag.Name) {
-		dirName := fmt.Sprintf("%s/validator%d", c.String(outputFlag.Name), i)
-		if err := os.MkdirAll(dirName, 0755); err != nil {
-			return fmt.Errorf("failed to create directory: %w", err)
-		}
-
-		if err := lib.GenerateValidatorKeys(dirName, c.String(accountPasswordFlag.Name)); err != nil {
-			return err
-		}
-
+	if err := lib.SaveAllowListTOML(c.String(outputFlag.Name), enodes); err != nil {
+		return err
 	}
 
 	return nil

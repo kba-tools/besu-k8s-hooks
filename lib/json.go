@@ -80,6 +80,31 @@ type UserData struct {
 	GenesisNodeAllocation string   `json:"genesisNodeAllocation"`
 }
 
+func (g *Genesis) GenerateValidators(dirName string, validators int, password string) ([]string, error) {
+	enodes := make([]string, validators)
+
+	for i := range validators {
+		dirName := fmt.Sprintf("%s/validator%d", dirName, i)
+		if err := os.MkdirAll(dirName, 0755); err != nil {
+			return []string{}, fmt.Errorf("failed to create directory: %w", err)
+		}
+
+		nodePubKey, accountAddress, err := generateKeys(dirName, password)
+		if err != nil {
+			return []string{}, err
+		}
+
+		g.Alloc[accountAddress] = AllocAccount{Balance: "1000000000000000000000000000"}
+		enodes[i] = fmt.Sprintf("enode://%s@<HOST>:30303", nodePubKey)
+	}
+
+	if err := saveJSON(enodes, fmt.Sprintf("%s/besu", dirName), "static-nodes.json"); err != nil {
+		return []string{}, err
+	}
+
+	return enodes, nil
+}
+
 func (g *Genesis) Save(dirName string) error {
 	return saveJSON(g, fmt.Sprintf("%s/besu", dirName), "genesis.json")
 }
