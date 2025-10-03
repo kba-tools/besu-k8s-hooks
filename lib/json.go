@@ -55,21 +55,27 @@ type AllocAccount struct {
 }
 
 type UserData struct {
-	Consensus         string `json:"consensus"`
-	ChainID           int    `json:"chainID"`
-	BlockPeriod       int    `json:"blockperiod"`
-	RequestTimeout    int    `json:"requestTimeout"`
-	XEmptyBlockPeriod bool   `json:"xemptyBlockPeriod"`
-	EmptyBlockPeriod  int    `json:"emptyBlockPeriod"`
-	EpochLength       int    `json:"epochLength"`
-	Difficulty        int    `json:"difficulty"`
-	GasLimit          string `json:"gasLimit"`
-	Coinbase          string `json:"coinbase"`
-	MaxCodeSize       int    `json:"maxCodeSize"`
-	TxnSizeLimit      int    `json:"txnSizeLimit"`
-	Validators        int    `json:"validators"`
-	AccountPassword   string `json:"accountPassword"`
-	OutputPath        string `json:"outputPath"`
+	Consensus             string   `json:"consensus"`
+	ChainID               int      `json:"chainID"`
+	BlockPeriod           int      `json:"blockperiod"`
+	RequestTimeout        int      `json:"requestTimeout"`
+	XEmptyBlockPeriod     bool     `json:"xemptyBlockPeriod"`
+	EmptyBlockPeriod      int      `json:"emptyBlockPeriod"`
+	EpochLength           int      `json:"epochLength"`
+	Difficulty            int      `json:"difficulty"`
+	GasLimit              string   `json:"gasLimit"`
+	Coinbase              string   `json:"coinbase"`
+	MaxCodeSize           int      `json:"maxCodeSize"`
+	TxnSizeLimit          int      `json:"txnSizeLimit"`
+	Validators            int      `json:"validators"`
+	AccountPassword       string   `json:"accountPassword"`
+	OutputPath            string   `json:"outputPath"`
+	TesseraEnabled        bool     `json:"tesseraEnabled"`
+	TesseraPassword       string   `json:"tesseraPassword"`
+	QuickstartDevAccounts bool     `json:"quickstartDevAccounts"`
+	NoOutputTimestamp     bool     `json:"noOutputTimestamp"`
+	PrefundedAccounts     struct{} `json:"prefundedAccounts"`
+	GenesisNodeAllocation string   `json:"genesisNodeAllocation"`
 }
 
 func (g *Genesis) Save(dirName string) error {
