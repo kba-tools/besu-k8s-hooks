@@ -191,6 +191,8 @@ func generate(ctx context.Context, c *cli.Command) error {
 		return err
 	}
 
+	fmt.Printf("\nAll files are saved to \033[0;34m'%s'\033[0m.\n", c.String(outputFlag.Name))
+
 	return nil
 }
 
