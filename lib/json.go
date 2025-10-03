@@ -81,25 +81,34 @@ type UserData struct {
 }
 
 func (g *Genesis) Save(dirName string) error {
-	return saveJSON(g, fmt.Sprintf("%s/besu", dirName), fmt.Sprintf("%s/besu/genesis.json", dirName))
+	return saveJSON(g, fmt.Sprintf("%s/besu", dirName), "genesis.json")
 }
 
 func (u *UserData) Save(dirName string) error {
-	return saveJSON(u, dirName, fmt.Sprintf("%s/userData.json", dirName))
+	return saveJSON(u, dirName, "userData.json")
 }
 
 func saveJSON[T any](value T, dirName, fileName string) error {
-	data, err := json.MarshalIndent(value, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal: %w", err)
-	}
-
 	if err := os.MkdirAll(dirName, 0755); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
-	if err := os.WriteFile(fileName, data, 0644); err != nil {
-		return fmt.Errorf("failed to write file: %w", err)
+	f, err := os.Create(fmt.Sprintf("%s/%s", dirName, fileName))
+	if err != nil {
+		return fmt.Errorf("failed to create file: %w", err)
+	}
+	defer func() {
+		if err = f.Close(); err != nil {
+			fmt.Printf("failed to close file: %v\n", err)
+		}
+	}()
+
+	enc := json.NewEncoder(f)
+	enc.SetIndent("", "  ")
+	enc.SetEscapeHTML(false)
+
+	if err := enc.Encode(value); err != nil {
+		return fmt.Errorf("failed to encode JSON: %w", err)
 	}
 
 	return nil
