@@ -11,4 +11,4 @@ RUN KUBECTL_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt) && \
     curl -s "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl && \
     chmod a+x /usr/local/bin/kubectl
 
-RUN curl -sSfL https://raw.githubusercontent.com/kba-tools/besu-k8s-hooks/main/install.sh | sh -s
+RUN curl -sSfL https://raw.githubusercontent.com/kba-tools/besu-k8s-hooks/main/install.sh | sh -s -- -b ./hooks
