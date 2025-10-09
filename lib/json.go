@@ -3,7 +3,12 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
+	"math/big"
 	"os"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 type Genesis struct {
@@ -82,6 +87,7 @@ type UserData struct {
 
 func (g *Genesis) GenerateValidators(dirName string, validators int, password string) ([]string, error) {
 	enodes := make([]string, validators)
+	validatorAddresses := make([]common.Address, validators)
 
 	for i := range validators {
 		dirName := fmt.Sprintf("%s/validator%d", dirName, i)
@@ -89,13 +95,18 @@ func (g *Genesis) GenerateValidators(dirName string, validators int, password st
 			return []string{}, fmt.Errorf("failed to create directory: %w", err)
 		}
 
-		nodePubKey, accountAddress, err := generateKeys(dirName, password)
+		address, nodePubKey, accountAddress, err := generateKeys(dirName, password)
 		if err != nil {
 			return []string{}, err
 		}
 
 		g.Alloc[accountAddress] = AllocAccount{Balance: "1000000000000000000000000000"}
 		enodes[i] = fmt.Sprintf("enode://%s@<HOST>:30303", nodePubKey)
+		validatorAddresses[i] = address
+	}
+
+	if err := g.generateExtraData(validatorAddresses); err != nil {
+		return nil, err
 	}
 
 	if err := saveJSON(enodes, fmt.Sprintf("%s/besu", dirName), "static-nodes.json"); err != nil {
@@ -103,6 +114,29 @@ func (g *Genesis) GenerateValidators(dirName string, validators int, password st
 	}
 
 	return enodes, nil
+}
+
+func (g *Genesis) generateExtraData(addrs []common.Address) error {
+	var validatorList [][]byte
+	for _, a := range addrs {
+		validatorList = append(validatorList, a.Bytes())
+	}
+
+	extraDataContent := []any{
+		make([]byte, 32), // Vanity
+		validatorList,    // Validators
+		[][]byte{},       // Vote
+		big.NewInt(0),    // Round
+		[][]byte{},       // Seals
+	}
+
+	encoded, err := rlp.EncodeToBytes(extraDataContent)
+	if err != nil {
+		return fmt.Errorf("failed to generate extraData: %v", err)
+	}
+
+	g.ExtraData = hexutil.Encode(encoded)
+	return nil
 }
 
 func (g *Genesis) Save(dirName string) error {
