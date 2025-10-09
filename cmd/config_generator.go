@@ -44,6 +44,7 @@ var (
 	xemptyBlockPeriodFlag = &cli.BoolFlag{
 		Name:  "xemptyBlockPeriod",
 		Usage: "Increase the block time when there are no transactions",
+		Value: false,
 	}
 	emptyBlockPeriodFlag = &cli.IntFlag{
 		Name:  "emptyBlockPeriod",
@@ -135,10 +136,9 @@ func generate(ctx context.Context, c *cli.Command) error {
 			ZeroBaseFee:         true,
 			ContractSizeLimit:   c.Int(maxCodeSizeFlag.Name),
 			QBFT: lib.QBFTConfig{
-				BlockPeriodSeconds:       c.Int(blockperiodFlag.Name),
-				XEmptyBlockPeriodSeconds: c.Int(emptyBlockPeriodFlag.Name),
-				RequestTimeoutSeconds:    c.Int(requestTimeoutFlag.Name),
-				EpochLength:              c.Int(epochLengthFlag.Name),
+				BlockPeriodSeconds:    c.Int(blockperiodFlag.Name),
+				RequestTimeoutSeconds: c.Int(requestTimeoutFlag.Name),
+				EpochLength:           c.Int(epochLengthFlag.Name),
 			},
 		},
 		Alloc: make(map[string]lib.AllocAccount, c.Int(validatorsFlag.Name)),
@@ -151,8 +151,6 @@ func generate(ctx context.Context, c *cli.Command) error {
 		Coinbase:              c.String(coinbaseFlag.Name),
 		BlockPeriod:           c.Int(blockperiodFlag.Name),
 		RequestTimeout:        c.Int(requestTimeoutFlag.Name),
-		XEmptyBlockPeriod:     c.Bool(xemptyBlockPeriodFlag.Name),
-		EmptyBlockPeriod:      c.Int(emptyBlockPeriodFlag.Name),
 		EpochLength:           c.Int(epochLengthFlag.Name),
 		GasLimit:              c.String(gasLimitFlag.Name),
 		MaxCodeSize:           c.Int(maxCodeSizeFlag.Name),
@@ -168,6 +166,12 @@ func generate(ctx context.Context, c *cli.Command) error {
 		NoOutputTimestamp:     false,
 		PrefundedAccounts:     struct{}{},
 		GenesisNodeAllocation: "1000000000000000000000000000",
+	}
+
+	if c.Bool(xemptyBlockPeriodFlag.Name) {
+		genesis.Config.QBFT.XEmptyBlockPeriodSeconds = c.Int(emptyBlockPeriodFlag.Name)
+		userData.XEmptyBlockPeriod = c.Bool(xemptyBlockPeriodFlag.Name)
+		userData.EmptyBlockPeriod = c.Int(emptyBlockPeriodFlag.Name)
 	}
 
 	enodes, err := genesis.GenerateValidators(c.String(outputFlag.Name), c.Int(validatorsFlag.Name), c.String(accountPasswordFlag.Name))

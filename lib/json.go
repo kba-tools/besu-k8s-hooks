@@ -47,7 +47,7 @@ type QBFTConfig struct {
 	BlockPeriodSeconds       int `json:"blockperiodseconds"`
 	EpochLength              int `json:"epochlength"`
 	RequestTimeoutSeconds    int `json:"requesttimeoutseconds"`
-	XEmptyBlockPeriodSeconds int `json:"xemptyblockperiodseconds"`
+	XEmptyBlockPeriodSeconds int `json:"xemptyblockperiodseconds,omitempty"`
 }
 
 type AllocAccount struct {
@@ -59,8 +59,8 @@ type UserData struct {
 	ChainID               int      `json:"chainID"`
 	BlockPeriod           int      `json:"blockperiod"`
 	RequestTimeout        int      `json:"requestTimeout"`
-	XEmptyBlockPeriod     bool     `json:"xemptyBlockPeriod"`
-	EmptyBlockPeriod      int      `json:"emptyBlockPeriod"`
+	XEmptyBlockPeriod     bool     `json:"xemptyBlockPeriod,omitempty"`
+	EmptyBlockPeriod      int      `json:"emptyBlockPeriod,omitempty"`
 	EpochLength           int      `json:"epochLength"`
 	Difficulty            int      `json:"difficulty"`
 	GasLimit              string   `json:"gasLimit"`
